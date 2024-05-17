@@ -6,18 +6,15 @@ name:  <unnamed>
   log type:  text
  opened on:  16 May 2024, 23:20:00
 
-. 
-. //1. data
-. global repo "https://github.com/jhustata/project/raw/main/"
 
-. global nhanes "https://wwwn.cdc.gov/Nchs/Nhanes/"
+//1. data
+global repo "https://github.com/jhustata/project/raw/main/"
 
-. 
-. //2. code
-. do ${repo}followup.do
+global nhanes "https://wwwn.cdc.gov/Nchs/Nhanes/"
 
-. 
-. /*
+ //2. code
+do ${repo}followup.do
+/*
 > 
 > 6.2 Code Development:
 > Edit and Rename Provided Script:
@@ -32,160 +29,116 @@ name:  <unnamed>
 > Instruction from: https://jhustata.github.io/intermediate/chapter6.html#code-development
 > 
 > */
-. 
-. 
-. //di "What is your work directory?" _request(workdir)
-. //cd "$workdir"
-. 
-. //cd "C:\PUBLIC USE DATA"    // SET DIRECTORY WHERE DATA ARE LOCATED, E.G. "C:\PUBLIC USE DA
+
+//di "What is your work directory?" _request(workdir)
+//cd "$workdir"
+
+//cd "C:\PUBLIC USE DATA"    // SET DIRECTORY WHERE DATA ARE LOCATED, E.G. "C:\PUBLIC USE DA
 > TA"
-. global SURVEY NHANES_1999_2000     // REPLACE <SURVEY> WITH RELEVANT SURVEY NAME (IN ALL CAP
+ global SURVEY NHANES_1999_2000     // REPLACE <SURVEY> WITH RELEVANT SURVEY NAME (IN ALL CAP
 > S)
 
-. //the above scripts deal with a local file
-. //i've edited to work remotely, as we've learned in stata II
-. global mort "https://ftp.cdc.gov/pub/HEALTH_STATISTICS/NCHS/datalinkage/linked_mortality/"
+//the above scripts deal with a local file
+//i've edited to work remotely, as we've learned in stata II
+global mort "https://ftp.cdc.gov/pub/HEALTH_STATISTICS/NCHS/datalinkage/linked_mortality/"
 
-. global repo "https://github.com/jhustata/project/raw/main/"
+global repo "https://github.com/jhustata/project/raw/main/"
 
-. * example syntax: 
-. * global SURVEY NHIS_2018
-. * or
-. * global SURVEY NHANES_2017_2018
-. 
-. clear all
+* example syntax:
+* global SURVEY NHIS_2018
+* or
+* global SURVEY NHANES_2017_2018
 
-. **************
-. *NHIS VERSION*
-. **************
-. 
-. // DEFINE VALUE LABELS FOR REPORTS
-. label define eligfmt 1 "Eligible" 2 "Under age 18, not available for public release" 3 "Inel
+clear all
+
+**************
+*NHIS VERSION*
+**************
+ 
+// DEFINE VALUE LABELS FOR REPORTS
+ label define eligfmt 1 "Eligible" 2 "Under age 18, not available for public release" 3 "Inel
 > igible" 
 
-. label define mortfmt 0 "Assumed alive" 1 "Assumed deceased" .z "Ineligible or under age 18"
+label define mortfmt 0 "Assumed alive" 1 "Assumed deceased" .z "Ineligible or under age 18"
 
-. label define flagfmt 0 "No - Condition not listed as a multiple cause of death" 1 "Yes - Con
+label define flagfmt 0 "No - Condition not listed as a multiple cause of death" 1 "Yes - Con
 > dition listed as a multiple cause of death" .z "Assumed alive, under age 18, ineligible for 
 > mortality follow-up, or MCOD not available"
 
-. label define qtrfmt 1 "January-March" 2 "April-June" 3 "July-September" 4 "October-December"
->  .z "Ineligible, under age 18, or assumed alive"
+label define qtrfmt 1 "January-March" 2 "April-June" 3 "July-September" 4 "October-December"
+z "Ineligible, under age 18, or assumed alive"
 
-. label define dodyfmt .z "Ineligible, under age 18, or assumed alive"
+label define dodyfmt .z "Ineligible, under age 18, or assumed alive"
 
-. label define ucodfmt 1 "Diseases of heart (I00-I09, I11, I13, I20-I51)"                     
->       
+label define ucodfmt 1 "Diseases of heart (I00-I09, I11, I13, I20-I51)"                     
+      
 
-. label define ucodfmt 2 "Malignant neoplasms (C00-C97)"                                      
+ label define ucodfmt 2 "Malignant neoplasms (C00-C97)"                                      
 >       , add
 
-. label define ucodfmt 3 "Chronic lower respiratory diseases (J40-J47)"                       
+ label define ucodfmt 3 "Chronic lower respiratory diseases (J40-J47)"                       
 >       , add
 
-. label define ucodfmt 4 "Accidents (unintentional injuries) (V01-X59, Y85-Y86)"              
+ label define ucodfmt 4 "Accidents (unintentional injuries) (V01-X59, Y85-Y86)"              
 >       , add
 
-. label define ucodfmt 5 "Cerebrovascular diseases (I60-I69)"                                 
+ label define ucodfmt 5 "Cerebrovascular diseases (I60-I69)"                                 
 >       , add
 
-. label define ucodfmt 6 "Alzheimer's disease (G30)"                                          
+label define ucodfmt 6 "Alzheimer's disease (G30)"                                          
 >       , add
 
-. label define ucodfmt 7 "Diabetes mellitus (E10-E14)"                                        
+label define ucodfmt 7 "Diabetes mellitus (E10-E14)"                                        
 >       , add
 
-. label define ucodfmt 8 "Influenza and pneumonia (J09-J18)"                                  
+ label define ucodfmt 8 "Influenza and pneumonia (J09-J18)"                                  
 >       , add
 
-. label define ucodfmt 9 "Nephritis, nephrotic syndrome and nephrosis (N00-N07, N17-N19, N25-N
+label define ucodfmt 9 "Nephritis, nephrotic syndrome and nephrosis (N00-N07, N17-N19, N25-N
 > 27)"  , add
 
-. label define ucodfmt 10 "All other causes (residual)"                                       
+ label define ucodfmt 10 "All other causes (residual)"                                       
 >       , add
 
-. label define ucodfmt .z "Ineligible, under age 18, assumed alive, or no cause of death data"
+label define ucodfmt .z "Ineligible, under age 18, assumed alive, or no cause of death data"
 >       , add
 
-. 
-. // READ IN THE FIXED-WIDTH FORMAT ASCII PUBLIC-USE LMF
-. //infix str publicid 1-14 eligstat 15 mortstat 16 ucod_leading 17-19 diabetes 20 hyperten 21
+
+// READ IN THE FIXED-WIDTH FORMAT ASCII PUBLIC-USE LMF
+//infix str publicid 1-14 eligstat 15 mortstat 16 ucod_leading 17-19 diabetes 20 hyperten 21
 >  dodqtr 22 dodyear 23-26 wgt_new 27-34 sa_wgt_new 35-42 using ${SURVEY}_MORT_2019_PUBLIC.dat
 >         
-. 
-. //let read in the ASCII PUBLIC-USE from the CDC/NCHS website instead of downloading it local
+ 
+//let read in the ASCII PUBLIC-USE from the CDC/NCHS website instead of downloading it local
 > ly 
-. infix str publicid 1-14 eligstat 15 mortstat 16 ucod_leading ///
+infix str publicid 1-14 eligstat 15 mortstat 16 ucod_leading ///
 >     17-19 diabetes 20 hyperten 21 dodqtr 22 dodyear ///
 >         23-26 wgt_new 27-34 sa_wgt_new 35-42 using ///   
 >     "${mort}NHANES_1999_2000_MORT_2019_PUBLIC.dat"
-(9,965 observations read)
 
-. 
-. // REPLACE MISSING VALUES TO .z FOR LABELING
-. replace mortstat = .z if mortstat >=.
-(4,520 real changes made, 4,520 to missing)
+ // DEFINE VARIABLE LABELS 
+label var publicid "NHIS Public-ID Number"
 
-. replace ucod_leading = .z if ucod_leading >=.
-(8,291 real changes made, 8,291 to missing)
+label var eligstat "Eligibility Status for Mortality Follow-up"
 
-. replace diabetes = .z if diabetes >=.
-(8,291 real changes made, 8,291 to missing)
+label var mortstat "Final Mortality Status"
 
-. replace hyperten = .z if hyperten >=.
-(8,291 real changes made, 8,291 to missing)
+label var ucod_leading "Underlying Cause of Death: Recode"
 
-. replace dodqtr = .z if dodqtr >=.
-(9,965 real changes made, 9,965 to missing)
+label var diabetes "Diabetes flag from Multiple Cause of Death"
 
-. replace dodyear = .z if dodyear >=.
-(9,965 real changes made, 9,965 to missing)
+label var hyperten "Hypertension flag from Multiple Cause of Death"
 
-. 
-. 
-. // DEFINE VARIABLE LABELS 
-. label var publicid "NHIS Public-ID Number"
+label var dodqtr  "Quarter of Death"
 
-. label var eligstat "Eligibility Status for Mortality Follow-up"
+label var dodyear "Year of Death"
 
-. label var mortstat "Final Mortality Status"
+label var wgt_new  "Weight Adjusted for Ineligible Respondents: Person-level Sample Weight"
 
-. label var ucod_leading "Underlying Cause of Death: Recode"
-
-. label var diabetes "Diabetes flag from Multiple Cause of Death"
-
-. label var hyperten "Hypertension flag from Multiple Cause of Death"
-
-. label var dodqtr  "Quarter of Death"
-
-. label var dodyear "Year of Death"
-
-. label var wgt_new  "Weight Adjusted for Ineligible Respondents: Person-level Sample Weight"
-
-. label var sa_wgt_new  "Weight Adjusted for Ineligible Respondents: Sample Adult Sample Weigh
+label var sa_wgt_new  "Weight Adjusted for Ineligible Respondents: Sample Adult Sample Weigh
 > t"
 
-. 
-. 
-. // ASSOCIATE VARIABLES WITH FORMAT VALUES 
-. label values eligstat eligfmt
-
-. label values mortstat mortfmt
-
-. label values ucod_leading ucodfmt
-
-. label values dodqtr     qtrfmt
-
-. label values diabetes flagfmt
-
-. label values hyperten flagfmt
-
-. label values dodyear dodyfmt
-
-. 
-. 
-. // DISPLAY OVERALL DESCRIPTION OF FILE 
-. describe
+// ASSOCIATE VARIABLES WITH FORMAT VALUES 
 
 Contains data
  Observations:         9,965                  
@@ -210,10 +163,8 @@ sa_wgt_new      float   %9.0g                 Weight Adjusted for Ineligible Res
 Sorted by: 
      Note: Dataset has changed since last saved.
 
-. 
-. 
-. // ONE-WAY FREQUENCIES (UNWEIGHTED)
-. tab1 eligstat mortstat ucod_leading diabetes hyperten dodqtr dodyear, missing
+// ONE-WAY FREQUENCIES (UNWEIGHTED)
+tab1 eligstat mortstat ucod_leading diabetes hyperten dodqtr dodyear, missing
 
 -> tabulation of eligstat  
 
@@ -292,147 +243,23 @@ Ineligible, under age 18, or assumed al |      9,965      100.00      100.00
 ----------------------------------------+-----------------------------------
                                   Total |      9,965      100.00
 
-. 
-.  
-. // SAVE DATA FILE IN DIRECTORY DESIGNATED AT TOP OF PROGRAM AS **SURVEY**_PUF.DTA
-. // replace option allows Stata to overwrite an existing .dta file
-. /*
+ // SAVE DATA FILE IN DIRECTORY DESIGNATED AT TOP OF PROGRAM AS **SURVEY**_PUF.DTA
+ // replace option allows Stata to overwrite an existing .dta file
+
 > - I briefly changed the line below to "save demo/${SURVEY}_PUF, replace"
 > - Then discovered that students were using MY followup.do instead of their own!!!
-> */
-. save ${SURVEY}_PUF , replace
+save ${SURVEY}_PUF , replace
 (file NHANES_1999_2000_PUF.dta not found)
 file NHANES_1999_2000_PUF.dta saved
 
-. 
-. 
-. ******************
-. 
-. 
-. ****************
-. *NHANES VERSION*
-. ****************
-. clear all
+****************
+*NHANES VERSION*
+****************
+clear all
+// DEFINE VALUE LABELS FOR REPORTS
+label define premiss .z "Missing"
 
-. 
-. // DEFINE VALUE LABELS FOR REPORTS
-. label define premiss .z "Missing"
-
-. label define eligfmt 1 "Eligible" 2 "Under age 18, not available for public release" 3 "Inel
-> igible" 
-
-. label define mortfmt 0 "Assumed alive" 1 "Assumed deceased" .z "Ineligible or under age 18"
-
-. label define flagfmt 0 "No - Condition not listed as a multiple cause of death" 1 "Yes - Con
-> dition listed as a multiple cause of death" .z "Assumed alive, under age 18, ineligible for 
-> mortality follow-up, or MCOD not available"
-
-. label define qtrfmt 1 "January-March" 2 "April-June" 3 "July-September" 4 "October-December"
->  .z "Ineligible, under age 18, or assumed alive"
-
-. label define dodyfmt .z "Ineligible, under age 18, or assumed alive"
-
-. label define ucodfmt 1 "Diseases of heart (I00-I09, I11, I13, I20-I51)"                     
->       
-
-. label define ucodfmt 2 "Malignant neoplasms (C00-C97)"                                      
->       , add
-
-. label define ucodfmt 3 "Chronic lower respiratory diseases (J40-J47)"                       
->       , add
-
-. label define ucodfmt 4 "Accidents (unintentional injuries) (V01-X59, Y85-Y86)"              
->       , add
-
-. label define ucodfmt 5 "Cerebrovascular diseases (I60-I69)"                                 
->       , add
-
-. label define ucodfmt 6 "Alzheimer's disease (G30)"                                          
->       , add
-
-. label define ucodfmt 7 "Diabetes mellitus (E10-E14)"                                        
->       , add
-
-. label define ucodfmt 8 "Influenza and pneumonia (J09-J18)"                                  
->       , add
-
-. label define ucodfmt 9 "Nephritis, nephrotic syndrome and nephrosis (N00-N07, N17-N19, N25-N
-> 27)"  , add
-
-. label define ucodfmt 10 "All other causes (residual)"                                       
->       , add
-
-. label define ucodfmt .z "Ineligible, under age 18, assumed alive, or no cause of death data"
->       , add
-
-. 
-. // READ IN THE FIXED-WIDTH FORMAT ASCII PUBLIC-USE LMF
-. infix seqn 1-6 eligstat 15 mortstat 16 ucod_leading 17-19 diabetes 20 hyperten 21 permth_int
->  43-45 permth_exm 46-48 using "${mort}NHANES_1999_2000_MORT_2019_PUBLIC.dat"
-(9,965 observations read)
-
-. 
-. 
-. // REPLACE MISSING VALUES TO .z FOR LABELING
-. replace mortstat = .z if mortstat >=.
-(4,520 real changes made, 4,520 to missing)
-
-. replace ucod_leading = .z if ucod_leading >=.
-(8,291 real changes made, 8,291 to missing)
-
-. replace diabetes = .z if diabetes >=.
-(8,291 real changes made, 8,291 to missing)
-
-. replace hyperten = .z if hyperten >=.
-(8,291 real changes made, 8,291 to missing)
-
-. replace permth_int = .z if permth_int >=.
-(4,520 real changes made, 4,520 to missing)
-
-. replace permth_exm = .z if permth_exm >=.
-(4,992 real changes made, 4,992 to missing)
-
-. 
-. 
-. // DEFINE VARIABLE LABELS 
-. label var seqn "NHANES Respondent Sequence Number"
-
-. label var eligstat "Eligibility Status for Mortality Follow-up"
-
-. label var mortstat "Final Mortality Status"
-
-. label var ucod_leading "Underlying Cause of Death: Recode"
-
-. label var diabetes "Diabetes flag from Multiple Cause of Death"
-
-. label var hyperten "Hypertension flag from Multiple Cause of Death"
-
-. label var permth_int "Person-Months of Follow-up from NHANES Interview date"
-
-. label var permth_exm "Person-Months of Follow-up from NHANES Mobile Examination Center (MEC)
->  Date"
-
-. 
-. 
-. // ASSOCIATE VARIABLES WITH FORMAT VALUES 
-. label values eligstat eligfmt
-
-. label values mortstat mortfmt
-
-. label values ucod_leading ucodfmt
-
-. label values diabetes flagfmt
-
-. label values hyperten flagfmt
-
-. label value permth_int premiss
-
-. label value permth_exm premiss
-
-. 
-. 
-. // DISPLAY OVERALL DESCRIPTION OF FILE 
-. describe
+# hyperten "Hypertension flag from Multiple Cause of Death"
 
 Contains data
  Observations:         9,965                  
@@ -455,10 +282,6 @@ permth_exm      float   %9.0g      premiss    Person-Months of Follow-up from NH
 Sorted by: 
      Note: Dataset has changed since last saved.
 
-. 
-. 
-. // ONE-WAY FREQUENCIES (UNWEIGHTED)
-. tab1 eligstat mortstat ucod_leading diabetes hyperten, missing
 
 -> tabulation of eligstat  
 
@@ -521,7 +344,7 @@ Assumed alive, under age 18, ineligible |      8,291       83.20      100.00
 ----------------------------------------+-----------------------------------
                                   Total |      9,965      100.00
 
-. tab permth_int if permth_int==.z, missing
+tab permth_int if permth_int==.z, missing
 
 Person-Mont |
       hs of |
@@ -534,7 +357,7 @@ from NHANES |
 ------------+-----------------------------------
       Total |      4,520      100.00
 
-. tab permth_exm if permth_exm==.z, missing
+tab permth_exm if permth_exm==.z, missing
 
 Person-Mont |
       hs of |
@@ -549,27 +372,20 @@ Examination |
 ------------+-----------------------------------
       Total |      4,992      100.00
 
-. 
-. // SAVE DATA FILE IN DIRECTORY DESIGNATED AT TOP OF PROGRAM AS **SURVEY**_PUF.DTA
-. // replace option allows Stata to overwrite an existing .dta file
-. /*
+
+// SAVE DATA FILE IN DIRECTORY DESIGNATED AT TOP OF PROGRAM AS **SURVEY**_PUF.DTA
+// replace option allows Stata to overwrite an existing .dta file
+/*
 > - I briefly changed the line below to "save demo/${SURVEY}_PUF, replace"
 > - Then discovered that students were using MY followup.do instead of their own!!!
-> */
-. save ${SURVEY}_PUF, replace
+save ${SURVEY}_PUF, replace
 file NHANES_1999_2000_PUF.dta saved
 
-. 
-. 
-end of do-file
-
-. save followup, replace 
+save followup, replace 
 (file followup.dta not found)
 file followup.dta saved
-
-. import sasxport5 "${nhanes}1999-2000/DEMO.XPT", clear
-
-. merge 1:1 seqn using followup, nogen
+import sasxport5 "${nhanes}1999-2000/DEMO.XPT", clear
+merge 1:1 seqn using followup, nogen
 
     Result                      Number of obs
     -----------------------------------------
@@ -577,15 +393,11 @@ file followup.dta saved
     Matched                             9,965  
     -----------------------------------------
 
-. save survey_followup, replace 
-(file survey_followup.dta not found)
-file survey_followup.dta saved
 
-. 
-. //3. parameters
-. import sasxport5 "${nhanes}1999-2000/HUQ.XPT", clear
+ //3. parameters
+import sasxport5 "${nhanes}1999-2000/HUQ.XPT", clear
 
-. tab huq010 
+tab huq010 
 
     General |
      health |
@@ -600,7 +412,7 @@ file survey_followup.dta saved
 ------------+-----------------------------------
       Total |      9,960      100.00
 
-. merge 1:1 seqn using survey_followup, nogen keep(matched)
+merge 1:1 seqn using survey_followup, nogen keep(matched)
 
     Result                      Number of obs
     -----------------------------------------
@@ -608,14 +420,9 @@ file survey_followup.dta saved
     Matched                             9,965  
     -----------------------------------------
 
-. rm followup.dta
+rm followup.dta
 
-. rm survey_followup.dta
-
-. g years=permth_int/12
-(4,520 missing values generated)
-
-. stset years, fail(mortstat)
+rm survey_followup.dta
 
 Survival-time data settings
 
@@ -635,30 +442,24 @@ Observed time interval: (0, years]
                                      Earliest observed entry t =         0
                                           Last observed exit t =  20.83333
 
-. replace huq010=. if huq010==9
+replace huq010=. if huq010==9
 (5 real changes made, 5 to missing)
-
-. label define huq 1 "Excellent" 2 "Very Good" 3 "Good" 4 "Fair" 5 "Poor"
-
-. label values huq010 huq 
-
-. levelsof huq010, local(numlevels)
+label define huq 1 "Excellent" 2 "Very Good" 3 "Good" 4 "Fair" 5 "Poor"
+label values huq010 huq 
+levelsof huq010, local(numlevels)
 1 2 3 4 5
-
-. local i=1
-
-. foreach l of numlist `numlevels' {
+local i=1
+foreach l of numlist `numlevels' {
   2.     local vallab: value label huq010 
   3.         local catlab: lab `vallab' `l'
   4.         global legend`i' = "`catlab'"
   5.         local i= `i' + 1
   6. }
-
-. save week7, replace 
+ save week7, replace 
 (file week7.dta not found)
 file week7.dta saved
 
-. sts graph, ///
+sts graph, ///
 >     by(huq010) ///
 >         fail ///
 >         per(100) ///
@@ -677,16 +478,6 @@ file week7.dta saved
 >                 lab(5 "$legend5") ///
 >                 ring(0) pos(11) ///
 >         )
-
-        Failure _d: mortstat
-  Analysis time _t: years
-
-. graph export nonpara.png, replace 
-file /Users/kiyoi/Desktop/stata/stata II/Assignment 5/nonpara.png saved as PNG format
-
-. 
-. /* -- earlier code --*/
-. stcox i.huq010, basesurv(s0)
 
         Failure _d: mortstat
   Analysis time _t: years
@@ -717,9 +508,9 @@ Log likelihood = -13815.219                             Prob > chi2   = 0.0000
        Poor  |   7.475088   .7565146    19.88   0.000     6.130144    9.115111
 ------------------------------------------------------------------------------
 
-. matrix define mat = r(table)
+matrix define mat = r(table)
 
-. matrix list mat 
+matrix list mat 
 
 mat[9,5]
                1b.         2.         3.         4.         5.
@@ -734,75 +525,20 @@ pvalue          .  .00132548  2.285e-13  2.885e-35  6.528e-88
   crit   1.959964   1.959964   1.959964   1.959964   1.959964
  eform          1          1          1          1          1
 
-. matrix mat = mat'
+matrix mat = mat'
 
-. svmat mat
+svmat mat
 
-. preserve 
+preserve 
 
-. keep mat*
+keep mat*
 
-. drop if missing(mat1)
-(9,960 observations deleted)
-
-. rename (mat1 mat2 mat3 mat4 mat5 mat6 mat7 mat8 mat9)(b se z p ll ul df crit eform)
-
-. g x=_n
-
-. replace b=log(b)
-(5 real changes made)
-
-. replace ll=log(ll)
-(4 real changes made)
-
-. replace ul=log(ul)
-(4 real changes made)
-
-. twoway (scatter b x) || ///
->        (rcap ll ul x, ///
->                yline(0, lcol(lime)) ///
->                    ylab( ///
->                        -2.08 "0.125" ///
->                            -1.39 "0.25" ///
->                            -.69 "0.5" ///
->                              0 "1"  ///
->                            .69 "2" ///
->                            1.39 "4" ///
->                            2.08 "8" ///
->                            2.78 "16") ///
->                    legend(off)  ///
->                 xlab( ///
->            1 "$legend1" ///
->                    2 "$legend2" ///
->                    3 "$legend3" ///
->                    4 "$legend4" ///
->                    5 "$legend5") ///
->            xti("Self-Reported Health") ///
->                    ) 
-
-. graph export semipara_unadj.png, replace 
+graph export semipara_unadj.png, replace 
 file /Users/kiyoi/Desktop/stata/stata II/Assignment 5/semipara_unadj.png saved as PNG format
 
-. graph save semipara_unadj.gph, replace 
+graph save semipara_unadj.gph, replace 
 (file semipara_unadj.gph not found)
 file semipara_unadj.gph saved
-
-. restore 
-
-. 
-. hist ridageyr 
-(bin=39, start=0, width=2.1794872)
-
-. graph export nonpara.png, replace 
-file /Users/kiyoi/Desktop/stata/stata II/Assignment 5/nonpara.png saved as PNG format
-
-. //replace ridageyr=ridageyr/10
-. capture drop s0 
-
-. stcox i.huq010 ridageyr riagendr, basesurv(s0)
-
-        Failure _d: mortstat
-  Analysis time _t: years
 
 Iteration 0:   log likelihood = -14053.711
 Iteration 1:   log likelihood = -12507.535
@@ -842,11 +578,11 @@ scalars:
 matrices:
               r(table) :  9 x 7
 
-. matrix define mat_adj=r(table)
+matrix define mat_adj=r(table)
 
-. matrix define mat_adj=mat_adj'
+matrix define mat_adj=mat_adj'
 
-. matrix list mat_adj
+matrix list mat_adj
 
 mat_adj[7,9]
                     b          se           z      pvalue          ll          ul          df
@@ -867,60 +603,19 @@ mat_adj[7,9]
  ridageyr    1.959964           1
  riagendr    1.959964           1
 
-. svmat mat_adj
+svmat mat_adj
 
-. keep mat_adj*
+keep mat_adj*
 
-. drop if missing(mat_adj1)
-(9,958 observations deleted)
+e(0, lcol(lime)) ///
 
-. rename (mat_adj1 mat_adj2 mat_adj3 mat_adj4 mat_adj5 mat_adj6 mat_adj7 mat_adj8 mat_adj9)(b 
-> se z p ll ul df crit eform)
-
-. g x=_n
-
-. replace b=log(b)
-(7 real changes made)
-
-. replace ll=log(ll)
-(6 real changes made)
-
-. replace ul=log(ul)
-(6 real changes made)
-
-. twoway (scatter b x if inrange(x,1,5)) || ///
->        (rcap ll ul x if inrange(x,1,5), ///
->                yline(0, lcol(lime)) ///
->                    ylab( ///
->                        -2.08 "0.125" ///
->                            -1.39 "0.25" ///
->                            -.69 "0.5" ///
->                              0 "1"  ///
->                            .69 "2" ///
->                            1.39 "4" ///
->                            2.08 "8" ///
->                            2.78 "16") ///
->                    legend(off)  ///
->                 xlab( ///
->            1 "$legend1" ///
->                    2 "$legend2" ///
->                    3 "$legend3" ///
->                    4 "$legend4" ///
->                    5 "$legend5") ///
->            xti("Self-Reported Health") ///
->                    ) 
-
-. graph export semipara_adj.png, replace 
+graph export semipara_adj.png, replace 
 file /Users/kiyoi/Desktop/stata/stata II/Assignment 5/semipara_adj.png saved as PNG format
 
-. graph save semipara_adj.gph, replace 
+ graph save semipara_adj.gph, replace 
 (file semipara_adj.gph not found)
 file semipara_adj.gph saved
 
-. 
-. log close
-      name:  <unnamed>
-       log:  /Users/kiyoi/Desktop/stata/stata II/Assignment 5/hw7.Du.Sijin.log
-  log type:  text
+ 
  closed on:  16 May 2024, 23:20:10
 ----------------------------------------------------------------------------------------------
